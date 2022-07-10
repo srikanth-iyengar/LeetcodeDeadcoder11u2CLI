@@ -1,0 +1,6 @@
+applicationType: cli
+defaultPackage: com.github.Deadcoder11u2
+testFramework: junit
+sourceLanguage: java
+buildTool: maven
+features: [annotation-api, app-name, graalvm, http-client, jackson-databind, java, junit, logback, maven, picocli, picocli-java-application, picocli-junit, readme, shade, yaml]

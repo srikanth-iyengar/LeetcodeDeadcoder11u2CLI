@@ -1,0 +1,8 @@
+micronaut:
+  application:
+    name: cliapplication
+
+
+stackoverflow:
+  api:
+    url: https://api.stackexchange.com/2.2
