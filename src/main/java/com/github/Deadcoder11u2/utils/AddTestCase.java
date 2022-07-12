@@ -4,8 +4,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.Scanner;
 
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -48,17 +50,15 @@ public class AddTestCase implements Runnable{
         "   %s"+
         "}"+
         "}";
-    @Option(names = {"-m", "--method"}, description = "Method number from the Soltion class file")
-    int method = 0;
+    int method = 1;
 
-    @Option(names = {"-args", "-a"}, description = "Number of arguments of the method")
-    int arguments = 0;
+    int arguments = 1;
 
     @Option(names = {"-v", "--verbose"}, description = "Show all the scripts")
     boolean verbose;
 
-    @Option(names = {"-t", "--test-cases"}, description = "Number of testcases")
     int tc = 1;
+
     @Override
     public void run() {
         String args[];
@@ -69,24 +69,17 @@ public class AddTestCase implements Runnable{
         else {
             args = new String[]{"bash", "-c"};
         }
-
         File testFile = new File("methods" + method + ".test");
-        Scanner fs = new Scanner(System.in);
+        File mainFile = new File("Main.java");
+        Path path = Paths.get(testFile.getName());
+        int lines = 1;
         try {
-            testFile.createNewFile();
-            PrintWriter pw = new PrintWriter(testFile);
-            for(int i = 0 ; i <  tc; i++) {
-                for(int j = 0 ; j < arguments ; j++) {
-                    pw.write(fs.nextLine());
-                    pw.write("\n");
-                }
-            }
-            pw.close();
+            lines = (int)Files.lines(path).count();
         }
         catch(Exception e) {
+            System.out.println("Line number exception");
+            throw new RuntimeException();
         }
-        fs.close();
-        File mainFile = new File("Main.java");
         try {
             mainFile.createNewFile();
             StringBuilder sb = new StringBuilder();
@@ -95,6 +88,7 @@ public class AddTestCase implements Runnable{
                 if(key.equals("methodName")) continue;
                 sb.append(arg.get(key) + key + ";");
             }
+            tc = lines/arguments;
             BufferedReader br = new BufferedReader(new FileReader(testFile));
             for(int test= 0 ; test < tc ; test++) {
                 for(int i = 0; i < arguments ; i++) {
@@ -169,6 +163,7 @@ public class AddTestCase implements Runnable{
                 }
                 paramCount++;
             }
+            arguments = paramCount;
         }
         catch(Exception e) {
             System.out.println(FAIL + "Method doesn't exist" + ENDC);
