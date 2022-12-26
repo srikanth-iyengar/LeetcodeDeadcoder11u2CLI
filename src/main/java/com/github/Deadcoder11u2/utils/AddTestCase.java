@@ -9,6 +9,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 
+import javax.annotation.processing.SupportedOptions;
+
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -57,6 +59,9 @@ public class AddTestCase implements Runnable{
     @Option(names = {"-v", "--verbose"}, description = "Show all the scripts")
     boolean verbose;
 
+    @Option(names = {"-d", "--decoration"}, description = "To disable colors of the output")
+    boolean decoration;
+
     int tc = 1;
 
     @Override
@@ -93,6 +98,7 @@ public class AddTestCase implements Runnable{
             for(int test= 0 ; test < tc ; test++) {
                 for(int i = 0; i < arguments ; i++) {
                     String s = br.readLine().replace("[", "{").replace("]", "}");
+                    sb.append("sol=new Solution();");
                     if(isArray.get("arg"+i)) {
                         sb.append("arg" + i  + "="+ "new " + arg.get("arg" + i) +s + ";");
                     }else {
@@ -118,10 +124,18 @@ public class AddTestCase implements Runnable{
             Process process = new ProcessBuilder(args[0], args[1], "javac Main.java").start();
             process.waitFor();
             if(process.exitValue() != 0) throw new RuntimeException();
-            System.out.println(OKBLUE + "Use the run to test solution against the testcases" + ENDC);
+            String output = "Use the run to test solution against the testcases" ;
+            if(!decoration) {
+                output = OKBLUE + output + ENDC;
+            }
+            System.out.println(output);
         }
         catch(Exception e) {
-            System.out.println(FAIL + "Something went wrong" + ENDC);
+            String output = "Something went wrong" ;
+            if(!decoration) {
+                output = FAIL + output + ENDC;
+            }
+            System.out.println(output);
         }
     }
 
@@ -140,7 +154,7 @@ public class AddTestCase implements Runnable{
             String splits[] = str.split("->");
             mp.put("methodName", splits[0]);
             String param = splits[1];
-            param = param.replace("{", "").replace("}", "").replace("Ljava.lang.", "").replace("class ", "").replace(";", "");
+            param = param.replace("{", "").replace("}", "").replace("Ljava.lang.", "").replace("class ", "").replace(";", "").replace("java.lang.", "");
             String params[] = param.split(",");
             int paramCount = 0;
             for(String par: params) {
@@ -166,7 +180,11 @@ public class AddTestCase implements Runnable{
             arguments = paramCount;
         }
         catch(Exception e) {
-            System.out.println(FAIL + "Method doesn't exist" + ENDC);
+            String output = "Method doesn't exist" ;
+            if(!decoration) {
+                output = FAIL + output + ENDC;
+            }
+            System.out.println(output);
             System.exit(-1);
         }
         return mp;

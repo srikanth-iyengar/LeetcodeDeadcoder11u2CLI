@@ -11,7 +11,9 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 @Command(name = "leetcode", description = "...",
-mixinStandardHelpOptions = true, subcommands = {CompileSolution.class, ShowMethods.class, AddTestCase.class, RunTestcase.class, FetchProblem.class})
+mixinStandardHelpOptions = true, 
+subcommands = {CompileSolution.class, ShowMethods.class, AddTestCase.class, RunTestcase.class, FetchProblem.class}
+)
 public class CliapplicationCommand implements Runnable {
     final    String HEADER = "\033[95m";
     final    String OKBLUE = "\033[94m";
@@ -25,6 +27,9 @@ public class CliapplicationCommand implements Runnable {
 
     @Option(names = {"-v", "--verbose"}, description = "...")
     boolean verbose;
+
+    @Option(names = {"-d", "--decoration"}, description = "To disable colors of the output")
+    boolean decoration;
 
     public static void main(String[] args) throws Exception {
         PicocliRunner.run(CliapplicationCommand.class, args);

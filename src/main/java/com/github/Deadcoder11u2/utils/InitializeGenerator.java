@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
+import picocli.CommandLine.Option;
+
 public class InitializeGenerator implements Runnable{
     String HEADER = "\033[95m";
     String OKBLUE = "\033[94m";
@@ -16,6 +18,10 @@ public class InitializeGenerator implements Runnable{
     String BOLD = "\033[1m";
     String UNDERLINE = "\033[4m";
     final String GENERATOR_CODE = "import java.lang.reflect.Method;"+"import java.lang.reflect.Parameter;"+"import java.util.ArrayList;"+"import java.util.TreeSet;"+"public class Generator {"+"    public final static TreeSet<String> TO_IGNORE;"+""+"    static {"+"        TO_IGNORE = new TreeSet<>();"+"        TO_IGNORE.add(\"wait\");"+"        TO_IGNORE.add(\"equals\");"+"        TO_IGNORE.add(\"toString\");"+"        TO_IGNORE.add(\"hashCode\");"+"        TO_IGNORE.add(\"getClass\");"+"        TO_IGNORE.add(\"notify\");"+"        TO_IGNORE.add(\"notifyAll\");"+"    }"+"    public static void main(String[] args) {"+"        Solution sol = new Solution();"+"        Class cls = sol.getClass();"+"        ArrayList<Method> meths = new ArrayList<>();"+"        for(Method meth: cls.getMethods()) {"+"            if(!TO_IGNORE.contains(meth.getName())) {"+"                meths.add(meth);"+"            }"+"        }"+"        meths.forEach(meth -> {"+"            System.out.print(meth.getName() + \"->{\");"+"            Parameter params[] = meth.getParameters();"+"            for(Parameter param: params) {"+"                System.out.print(param.getType()+\",\");"+"            };"+"            System.out.println(\"}\");"+"        });"+"   }"+"}";
+
+
+    @Option(names = {"-d", "--decoration"}, description = "To disable colors of the output")
+    boolean decoration;
 
     @Override
     public void run() {
@@ -47,8 +53,13 @@ public class InitializeGenerator implements Runnable{
                 pw.write("\n");
             }
             pw.close();
-            System.out.println(OKGREEN + " Initialized methods" + ENDC);
-            System.out.println(OKBLUE + " HINT: Use the tc command to add the testcases" + ENDC);
+            String output[] = new String[]{" Initialized methods", " HINT: Use the tc command to add the testcases"};
+            for(String s : output) {
+                if(!decoration) {
+                    s = OKGREEN + s + ENDC;
+                }
+                System.out.println(s);
+            }
         }
         catch(Exception e) {
             System.out.println("❌ Error while generating required files ❌");

@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 
 @Command(name = "compile", description = "Compile the solution file with testcases",
 mixinStandardHelpOptions = true)
@@ -18,6 +19,11 @@ final public class CompileSolution implements Runnable {
     String ENDC = "\033[0m";
     String BOLD = "\033[1m";
     String UNDERLINE = "\033[4m";
+
+
+    @Option(names = {"-d", "--decoration"}, description = "To disable colors of the output")
+    boolean decoration;
+
     @Override
     public void run() {
         try {
@@ -36,11 +42,18 @@ final public class CompileSolution implements Runnable {
                     BufferedReader br = new BufferedReader(new InputStreamReader(process.getErrorStream()));
                     String line ;
                     while((line = br.readLine()) != null) {
-                        System.out.println(FAIL + line + ENDC);
+                        String output = line;
+                        if(!decoration)
+                            output = FAIL + line + ENDC;
+                        System.out.println(output);
                     }
                     throw new RuntimeException("Compilation error");
                 }
-                System.out.println(OKGREEN + " Compilation Successfull" + ENDC);
+                String output = " Compilation Successfull" ;
+                if(!decoration) {
+                    output = OKGREEN + output + ENDC;
+                }
+                System.out.println(output);
                 Thread t1 = new Thread(new InitializeGenerator());
                 t1.start();
             }

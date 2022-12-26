@@ -34,12 +34,26 @@ public class FetchProblem implements Runnable {
     @Option(names = {"-v", "--verbose"}, description = "verbose")
     boolean verbose;
 
+    @Option(names = {"-d", "--decoration"}, description = "To disable colors of the output")
+    boolean decoration;
+
     @Override
     public void run() {
         try {
-            if(verbose)System.out.println(WARNING + "API call initiated" + ENDC);
+            if(verbose) {
+                String output = "API call initiated" ;
+                if(!decoration)
+                    output = WARNING + output + ENDC;
+                System.out.println(output);
+            }
             HashMap<String, String> data = fetchProblem(url);
-            if(verbose)System.out.println(WARNING + "Problem Fetched" + ENDC);
+            if(verbose){
+                String output = "Problem Fetched" ;
+                if(!decoration) {
+                    output = WARNING + output + ENDC;
+                }
+                System.out.println(output);
+            }
             File solutionFile = new File("Solution.java");
             PrintWriter pw = new PrintWriter(solutionFile);
             pw.write(data.get("code"));
@@ -48,11 +62,21 @@ public class FetchProblem implements Runnable {
             pw = new PrintWriter(testFile);
             pw.write(data.get("testCase"));
             pw.close();
-            if(verbose) System.out.println(WARNING + "all files created" + ENDC);
-            System.out.println(OKGREEN + " Fetched the problem Solution file created" + ENDC);
+            if(verbose) {
+                String output = "All files created" ;
+                if(!decoration) {
+                    output = WARNING + output + ENDC;
+                }
+                System.out.println(output);
+            }
+            String output = " Fetched the problem Solution file created" ;
+            if(!decoration) {
+                output = OKGREEN + output + ENDC;
+            }
+            System.out.println(output);
         }
         catch(Exception e) {
-             System.out.println(FAIL + "Failed to fetch the problem check the url again");
+             System.out.println("Failed to fetch the problem check the url again");
         }
     }
 

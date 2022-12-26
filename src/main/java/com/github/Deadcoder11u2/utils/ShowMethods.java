@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 
 
 @Command(name="methods", description = "Lists all the methods in the Solution.java file", mixinStandardHelpOptions = true)
@@ -20,6 +21,9 @@ public class ShowMethods implements Runnable {
     String BOLD = "\033[1m";
     String UNDERLINE = "\033[4m";
 
+    @Option(names = {"-d", "--decoration"}, description = "To disable colors of the output")
+    boolean decoration;
+
     @Override
     public void run() {
         File methods = new File("methods.leetcode");
@@ -29,17 +33,30 @@ public class ShowMethods implements Runnable {
                 String line;
                 int cnt = 1;
                 while((line = br.readLine()) != null) {
-                    System.out.println(OKCYAN + cnt + " -> "+ line + ENDC);
+                    if(!decoration) {
+                        System.out.println(cnt + " -> "+ line);
+                    }
+                    else {
+                        System.out.println(OKCYAN + cnt + " -> "+ line + ENDC);
+                    }
                     cnt++;
                 }
                 br.close();
             }
             catch(Exception e) {
-                System.out.println(FAIL + "Error while reading the file delete the methods file and generate it again" + ENDC);
+                String output = "Error while reading the file delete the methods file and generate it again" ;
+                if(!decoration) {
+                    output = FAIL + output + ENDC;
+                }
+                System.out.println(output);
             }
         }
         else {
-            System.out.println(FAIL + "Use the init command to generate methods" + ENDC);
+            String output = "Use the init command to generate methods" ;
+            if(!decoration) {
+                output = FAIL + output + ENDC;
+            }
+            System.out.println(output);
         }
     }
 }

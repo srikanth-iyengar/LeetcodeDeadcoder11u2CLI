@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.util.concurrent.TimeUnit;
 
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 
 @Command(name = "run", description = "Runs the program against the given testcases")
 public class RunTestcase implements Runnable{
@@ -17,6 +18,10 @@ public class RunTestcase implements Runnable{
     final    String ENDC = "\033[0m";
     final    String BOLD = "\033[1m";
     final    String UNDERLINE = "\033[4m";
+
+    @Option(names = {"-d", "--decoration"}, description = "To disable colors of the output")
+    boolean decoration;
+
     @Override
     public void run() {
         String args[];
@@ -34,7 +39,12 @@ public class RunTestcase implements Runnable{
                 BufferedReader br = new BufferedReader(new InputStreamReader(process.getErrorStream()));
                 String line;
                 while((line =br.readLine()) != null) {
-                    System.out.println(WARNING + line + ENDC);
+                    if(!decoration) {
+                        System.out.println(WARNING + line + ENDC);
+                    }
+                    else {
+                        System.out.println(line);
+                    }
                 }
                 br.close();
                 throw new RuntimeException();
@@ -42,13 +52,28 @@ public class RunTestcase implements Runnable{
             BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line;
             while((line = br.readLine()) != null) {
-                System.out.println(OKGREEN + line + ENDC);
+                if(!decoration) {
+                    System.out.println(OKGREEN + line + ENDC);
+                }
+                else {
+                    System.out.println(line);
+                }
             }
             br.close();
-            System.out.println(OKGREEN + " Tests run successfully" + ENDC);
+            if(!decoration) {
+                System.out.println(OKGREEN + " Tests run successfully" + ENDC);
+            }
+            else {
+                System.out.println(" Tests run successfully");
+            }
         }
         catch(Exception e) {
-            System.out.println(FAIL + "Program took more than 5 seconds to run OR Runtime exception" + ENDC);
+            if(!decoration) {
+                System.out.println(FAIL + "Program took more than 5 seconds to run OR Runtime exception" + ENDC);
+            }
+            else {
+                System.out.println("Program took more than 5 seconds to run OR Runtime exception");
+            }
         }
     }
 }
